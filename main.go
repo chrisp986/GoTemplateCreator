@@ -2,10 +2,8 @@ package main
 
 import (
 	"bufio"
-	"container/list"
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
 func check(e error) {
@@ -22,22 +20,20 @@ func getProjectName() string {
 }
 
 func createFolders(projectName string) {
-	pathC8 := filepath.Join("Base8/" + projectName + ".c8")
-	pathCwy := filepath.Join("Base8/" + projectName + ".cwy")
-	pathSys := filepath.Join("Base8/" + projectName + ".sys")
-	paths := list.New()
-	paths.PushFront(pathC8)
-	paths.PushFront(pathCwy)
-	paths.PushFront(pathSys)
+	pathBase := ("BASE8" + projectName + "c8")
+	// pathBase := filepath.Join("BASE8/", projectName, ".c8")
 
-	for index := 0; index < paths.Len(); index++ {
-		err := os.MkdirAll(pathC8, os.ModePerm)
+	fmt.Println(pathBase)
+	// pathC8 := filepath.Join(pathBase + projectName + ".c8")
+	// pathCwy := filepath.Join("BASE8/" + projectName + ".cwy")
+	// pathSys := filepath.Join("BASE8/" + projectName + ".sys")
+	// var strPaths = []string{pathC8, pathCwy, pathSys}
 
-	}
-	err := os.MkdirAll(pathC8, os.ModePerm)
-	err := os.MkdirAll(pathCwy, os.ModePerm)
-	err := os.MkdirAll(pathSys, os.ModePerm)
-	check(err)
+	// for _, path := range strPaths {
+	// 	err := os.MkdirAll(path, os.ModePerm)
+	// 	check(err)
+	// 	fmt.Println(path, " created..")
+	// }
 }
 
 func main() {
