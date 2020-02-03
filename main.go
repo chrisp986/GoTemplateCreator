@@ -10,6 +10,10 @@ import (
 	"strings"
 )
 
+const basePath = "C:/BASE8/"
+const dwgFilePath = "temp_files\\Blank_100_100.dwg"
+const cnfFilePath = "temp_files\\temp.cnf"
+
 var (
 	fileInfo *os.FileInfo
 	err      error
@@ -31,48 +35,61 @@ func checkFolderExist(path string) bool {
 	return folderExists
 }
 
-func getProjectName() string {
+func getInput() (output string) {
 	reader := bufio.NewReader(os.Stdin)
+	input, _ := reader.ReadString('\n')
+	return strings.Replace(input, "\r\n", "", -1)
+}
+
+func getProjectName() string {
 	fmt.Print("Enter Project Name:")
-	projectName, _ := reader.ReadString('\n')
-	projectName = strings.Replace(projectName, "\r\n", "", -1)
-	return projectName
+	userInput := getInput()
+	return userInput
 }
 
 func createFolders(projectName string) {
-	pathBase := filepath.Join("C:/BASE8/" + projectName)
+	fullPath := filepath.Join(basePath + projectName)
 	var strEndings = []string{".c8", ".cwy", ".p8k", ".sys"}
 	for _, ending := range strEndings {
-		if checkFolderExist(pathBase+ending) == false {
-			err := os.MkdirAll(pathBase+ending, os.ModePerm)
+		if checkFolderExist(fullPath+ending) == false {
+			err := os.MkdirAll(fullPath+ending, os.ModePerm)
 			check(err)
-			fmt.Println("->", pathBase+ending, " created..")
+			fmt.Println("->", fullPath+ending, " created..")
 		}
 	}
 }
 
-func Copy(src, dst string) error {
-	in, err := os.Open(src)
+func copy(src, dst string) (int64, error) {
+	sourceFileStat, err := os.Stat(src)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	defer in.Close()
 
-	out, err := os.Create(dst)
-	if err != nil {
-		return err
+	if !sourceFileStat.Mode().IsRegular() {
+		return 0, fmt.Errorf("%s is not a regular file", src)
 	}
-	defer out.Close()
 
-	_, err = io.Copy(out, in)
+	source, err := os.Open(src)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return out.Close()
+	defer source.Close()
+
+	destination, err := os.Create(dst)
+	if err != nil {
+		return 0, err
+	}
+	defer destination.Close()
+	nBytes, err := io.Copy(destination, source)
+	return nBytes, err
 }
 
 func main() {
 	fmt.Println("///  Go Template Creator v0.1  ///")
 	projectName := getProjectName()
 	createFolders(projectName)
+	copy(dwgFilePath, basePath+projectName+".sys/Blank_100_100.dwg")
+	fmt.Println("dwg file copied...")
+	copy(cnfFilePath, basePath+projectName+".p8k/"+projectName+".cnf")
+	fmt.Println("cnf file copied...")
 }
