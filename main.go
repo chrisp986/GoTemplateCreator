@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 const basePath = "C:/BASE8/"
@@ -25,14 +26,26 @@ func check(e error) {
 	}
 }
 
-func checkFolderExist(path string) bool {
-	var folderExists = false
-	folderInfo, _ := os.Stat(path)
-	if folderInfo != nil {
-		log.Println("Folder already exists.")
-		folderExists = true
+func createFolders(projectName string) {
+	fullPath := filepath.Join(basePath + projectName)
+	var strEndings = []string{".c8", ".cwy", ".p8k", ".sys"}
+	for _, ending := range strEndings {
+		if checkFileExist(fullPath+ending) == false {
+			err := os.MkdirAll(fullPath+ending, os.ModePerm)
+			check(err)
+			fmt.Println("->", fullPath+ending, " created..")
+		}
 	}
-	return folderExists
+}
+
+func checkFileExist(path string) bool {
+	var fileExist = false
+	_, err := os.Stat(path)
+	if err == nil {
+		log.Println(path, "already exists.")
+		fileExist = true
+	}
+	return fileExist
 }
 
 func getInput() (output string) {
@@ -47,39 +60,21 @@ func getProjectName() string {
 	return userInput
 }
 
-func createFolders(projectName string) {
-	fullPath := filepath.Join(basePath + projectName)
-	var strEndings = []string{".c8", ".cwy", ".p8k", ".sys"}
-	for _, ending := range strEndings {
-		if checkFolderExist(fullPath+ending) == false {
-			err := os.MkdirAll(fullPath+ending, os.ModePerm)
-			check(err)
-			fmt.Println("->", fullPath+ending, " created..")
-		}
-	}
-}
-
 func copy(src, dst string) (int64, error) {
-	sourceFileStat, err := os.Stat(src)
-	if err != nil {
-		return 0, err
-	}
-
-	if !sourceFileStat.Mode().IsRegular() {
-		return 0, fmt.Errorf("%s is not a regular file", src)
-	}
-
+	_, err := os.Stat(src)
+	check(err)
 	source, err := os.Open(src)
-	if err != nil {
-		return 0, err
-	}
+	check(err)
 	defer source.Close()
-
-	destination, err := os.Create(dst)
-	if err != nil {
+	_, err = os.Stat(dst)
+	if err == nil {
+		fmt.Println("Skipping because", dst, "already exists.")
 		return 0, err
 	}
+	destination, err := os.Create(dst)
+	check(err)
 	defer destination.Close()
+	fmt.Println("-> Moved file to: ", dst)
 	nBytes, err := io.Copy(destination, source)
 	return nBytes, err
 }
@@ -89,7 +84,8 @@ func main() {
 	projectName := getProjectName()
 	createFolders(projectName)
 	copy(dwgFilePath, basePath+projectName+".sys/Blank_100_100.dwg")
-	fmt.Println("dwg file copied...")
+	// fmt.Println("-> dwg file copied...")
 	copy(cnfFilePath, basePath+projectName+".p8k/"+projectName+".cnf")
-	fmt.Println("cnf file copied...")
+	// fmt.Println("-> cnf file copied...")
+	time.Sleep(5 * time.Second)
 }
