@@ -1,3 +1,6 @@
+// Go Template Creator v0.1
+// This tool is used to create a template project for KM projects which are used for automated vehicles.
+// Copyright by Christian
 package main
 
 import (
@@ -84,8 +87,6 @@ func main() {
 	projectName := getProjectName()
 	createFolders(projectName)
 	copy(dwgFilePath, basePath+projectName+".sys/Blank_100_100.dwg")
-	// fmt.Println("-> dwg file copied...")
 	copy(cnfFilePath, basePath+projectName+".p8k/"+projectName+".cnf")
-	// fmt.Println("-> cnf file copied...")
 	time.Sleep(5 * time.Second)
 }
