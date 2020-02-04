@@ -29,6 +29,9 @@ func check(e error) {
 	}
 }
 
+//createFolder() takes the projectName as input and adds the strings to the foldernames to create a full path
+//the new folders are then created in the C:\BASE8\ folder, since this is fixed this is a constant variable
+//Example: Project.c8, Project.cwy, Project.p8k, Project.sys
 func createFolders(projectName string) {
 	fullPath := filepath.Join(basePath + projectName)
 	var strEndings = []string{".c8", ".cwy", ".p8k", ".sys"}
@@ -41,6 +44,7 @@ func createFolders(projectName string) {
 	}
 }
 
+//checkFileExist() is called with the path it needs to check and then returns a bool value based on the os.FileInfo value
 func checkFileExist(path string) bool {
 	var fileExist = false
 	_, err := os.Stat(path)
@@ -51,18 +55,21 @@ func checkFileExist(path string) bool {
 	return fileExist
 }
 
+//getInput() takes the input from the user and returns this as string
 func getInput() (output string) {
 	reader := bufio.NewReader(os.Stdin)
 	input, _ := reader.ReadString('\n')
 	return strings.Replace(input, "\r\n", "", -1)
 }
 
+//getProjectName() asks for the projectName
 func getProjectName() string {
 	fmt.Print("Enter Project Name:")
 	userInput := getInput()
 	return userInput
 }
 
+//copy() checks if the file/folder exists and base on that copies the file to the folders in the C:\BASE8\ folder
 func copy(src, dst string) (int64, error) {
 	_, err := os.Stat(src)
 	check(err)
@@ -82,6 +89,8 @@ func copy(src, dst string) (int64, error) {
 	return nBytes, err
 }
 
+//main() the user has to enter the project name which will be used to name and then create the folders
+//after that the blnk dwg file and the renamed cnf file are copied in the new folders
 func main() {
 	fmt.Println("///  Go Template Creator v0.1  ///")
 	projectName := getProjectName()
