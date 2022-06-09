@@ -25,7 +25,7 @@ var (
 
 func check(e error) {
 	if e != nil {
-		panic(e)
+		log.Println("Error: ", e)
 	}
 }
 
